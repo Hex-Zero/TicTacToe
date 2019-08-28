@@ -1,0 +1,45 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+.game-window {
+	margin: 20px;
+	text-align: center;
+}
+.react-logo {
+	position: absolute;
+	bottom: 30px;
+	right: 20px;
+	width: 85px;
+	animation: rotating 3s linear infinite;
+}
+.Board {
+	display: flex;
+	width: 300px;
+	margin: 0px auto;
+}
+.row {
+	display: flex;
+	justify-content: center;
+	margin: 0px;
+}
+.Cell {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: solid 1px black;
+	background-color: antiquewhite;
+	width: 100px;
+	height: 100px;
+	font-size: 60px;
+}
+
+@keyframes rotating {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
