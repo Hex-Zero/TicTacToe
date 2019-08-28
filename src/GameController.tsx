@@ -91,11 +91,72 @@ export default class GameController extends React.PureComponent<{}, State> {
 			return
 		}
 		board[rowIndex][colIndex] = this.state.currentPlayerId
-		this.setState({
-			type: 'STARTED',
-			currentPlayerId: this.state.currentPlayerId === 0 ? 1 : 0,
-			board
-		})
+		const result = this._tryCompleteGame()
+		if (result == null) {
+			this.setState({
+				type: 'STARTED',
+				currentPlayerId: this.state.currentPlayerId === 0 ? 1 : 0,
+				board
+			})
+		} else {
+			this.setState({
+				type: 'COMPLETED',
+				result,
+				board
+			})
+		}
+	}
+	_tryCompleteGame(): Result | null {
+		if (this.state.type !== 'STARTED') {
+			return null
+		}
+		const board = this.state.board
+		for (let row = 0; row < board.length; row++) {
+			let hasWonForTheRow = true
+			for (let col = 0; col < board[row].length; col++) {
+				if (board[row][0] == null || board[row][col] !== board[row][0]) {
+					hasWonForTheRow = false
+					break
+				}
+			}
+			if (hasWonForTheRow) {
+				return { type: 'WINNER', winnerId: this.state.currentPlayerId }
+			}
+		}
+		for (let col = 0; col < board[0].length; col++) {
+			let hasWonForTheCol = true
+			for (let row = 0; row < board.length; row++) {
+				if (board[0][col] == null || board[row][col] !== board[0][col]) {
+					hasWonForTheCol = false
+					break
+				}
+			}
+			if (hasWonForTheCol) {
+				return { type: 'WINNER', winnerId: this.state.currentPlayerId }
+			}
+		}
+		if (board[0][0] != null && board[0][0] === board[1][1] && board[1][1] === board[2][2]) {
+			return { type: 'WINNER', winnerId: this.state.currentPlayerId }
+		}
+		if (board[0][2] != null && board[0][2] === board[1][1] && board[1][1] === board[2][0]) {
+			return { type: 'WINNER', winnerId: this.state.currentPlayerId }
+		}
+		let hasDrawn = true
+		for (let row = 0; row < board.length; row++) {
+			for (let col = 0; col < board[row].length; col++) {
+				if (board[row][col] == null) {
+					hasDrawn = false
+					break
+				}
+			}
+			if (!hasDrawn) {
+				break
+			}
+		}
+		if (hasDrawn) {
+			return { type: 'DRAW' }
+		}
+		return null
 	}
 	_getEmptyBoard(): Board {
 		return [ [ null, null, null ], [ null, null, null ], [ null, null, null ] ]
@@ -108,7 +169,7 @@ export default class GameController extends React.PureComponent<{}, State> {
 		if (result.type === 'DRAW') {
 			return 'Game is a Draw'
 		} else {
-			return 'Player ' + this._getPlayerName(result.winnerId) + 'has won!'
+			return 'Player ' + this._getPlayerName(result.winnerId) + ' has won!'
 		}
 	}
 }
